@@ -1,6 +1,14 @@
 Laboration 4
 ====
 
+22/9 Samtliga testfall har gått igenom.
+
+Mina kommentarer
+Visst strängberoende i view klasserna, har istället implementerat konstanter.
+Saknas namespaces
+Kastas undantag vid fel lösenord jag känner mig lite tveksam till detta. 
+Undatag bör vara något som kastas just när det är ett undantag i applikationen inte vid "normalt" användande
+
 Webbutveckling med PHP 
  <h2>Mål</h2>
 <p>Laboration 4 syftar till att låta dig vidareutveckla kod från en annan utvecklare från Laboration 2. </p>

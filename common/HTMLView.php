@@ -13,7 +13,7 @@ class HTMLView{
 				<meta charset='UTF-8'>
 			</head>
 			<body>
-
+				<h1>Laboration 4 - Registrera nya användare - al223bn/al223ec</h1>
 				$body
 				
 			</body>

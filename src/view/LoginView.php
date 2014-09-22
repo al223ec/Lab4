@@ -11,6 +11,10 @@ class LoginView{
 	private $password = "LoginView::Password";		// Lösenordets kakas namn.
 	private $message;								// Privat variabel för att visa fel/rättmeddelanden.
 
+	//Min uppdatering ta bort strängberoende
+	const ActionLogin = "LoginView::login"; 
+	const RememberMe = "LoginView::checked"; 
+	
 	public function __construct(LoginModel $model){
 
 		// Struktur för MVC.
@@ -21,8 +25,8 @@ class LoginView{
 
 	// Kontrollerar om användare tryckt på Logga in.
 	public function didUserPressLogin()	{
-		if(isset($_POST["LoginView::login"])){
-			return $_POST["LoginView::login"];
+		if(isset($_POST[self::ActionLogin])){
+			return $_POST[self::ActionLogin];
 		}
 		else{
 			return false;
@@ -31,7 +35,7 @@ class LoginView{
 
 	// Kontrollerar användare checkat i Håll mig inloggad.
 	public function RememberMeIsFilled(){
-		if(isset($_POST["LoginView::checked"])){
+		if(isset($_POST[self::RememberMe])){
 			return true;
 		}
 		else{
@@ -125,9 +129,7 @@ class LoginView{
 
 		$datetime = $this->getDateTime();
 
-		$ret = "<h1>Laboration 2 - Inloggning - al223bn</h1>";
-
-		$ret .= "<h2>Ej inloggad!</h2>";
+		$ret = "<h2>Ej inloggad!</h2>";
 
 		$ret .= 
 				"

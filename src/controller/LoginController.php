@@ -2,7 +2,8 @@
 
 require_once("src/model/LoginModel.php");
 require_once("src/view/LoginView.php");
-require_once("src/view/UserView.php");
+require_once("src/view/UserView.php");;
+require_once("src/view/RegisterUserView.php");
 require_once("./common/Helpers.php");
 
 
@@ -12,6 +13,7 @@ class LoginController{
 	private $loginview;
 	private $userview;
 	private $model;
+	private $registeruserview; 
 
 	public function __construct(){
 
@@ -19,15 +21,15 @@ class LoginController{
 		$this->model = new LoginModel();
 		$this->loginview = new LoginView($this->model);
 		$this->userview = new UserView($this->model);
+		$this->registeruserview = new RegisterUserView($this->model);
 		$this->helpers = new Helpers();
 	}
 
 	public function doControll(){
+		// Hanterar indata.
 
-	// Hanterar indata.
-
-	// Hämtar information som webbläsaren användaren sitter i.
-	$userAgent = $this->helpers->getUserAgent();
+		// Hämtar information som webbläsaren användaren sitter i.
+		$userAgent = $this->helpers->getUserAgent();
 
 		// Om det finns kakor lagrade och användaren inte redan är inloggad.
 		if($this->loginview->userIsRemembered() and !$this->model->userLoggedIn($userAgent)){
@@ -75,15 +77,30 @@ class LoginController{
 		}
 
 
-	// Generar utdata.
+		// Generar utdata.
 
 		// Om inloggningen lyckades visa användarfönstret.
 		if($this->model->userLoggedIn($userAgent)){
 			return $this->userview->showUser();
 		}
+		if($this->registeruserview->didUserPressRegister()){
+			return $this->registeruserview->getRegisterForm(); 
+		}
+
+		if($this->registeruserview->didUserPressSaveNewUser()){
+			$newUser = $this->registeruserview->getNewUser(); 
+			if($this->model->saveUser($newUser)){
+				$this->loginview->showStatus("Registrering av ny användare lyckades " . $newUser->getUserName());
+				$this->loginview->showLogin();
+			}
+			else{
+				return $this->registeruserview->getRegisterForm(); 
+			}
+		}
 		// Annars visa inloggningsfönstret.
 		else{
-			return $this->loginview->showLogin();
+
+			return $this->registeruserview->getRegisterLink() . $this->loginview->showLogin();
 		}
 	}
 }

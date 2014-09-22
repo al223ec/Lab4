@@ -1,12 +1,12 @@
 <?php
 
-
-
 class UserView{
 	
 	private $model;
 	private $message;
 
+	//Min uppdatering ta bort sträng beroende
+	const ActionLogout = "UserView::logout"; 
 
 	public function __construct(LoginModel $model){
 		$this->model = $model;
@@ -14,8 +14,8 @@ class UserView{
 
 	// Kontrollerar om användaren tryckt på Logga ut.
 	public function didUserPressLogout(){
-		if(isset($_POST["UserView::logout"])){
-			return $_POST["UserView::logout"];
+		if(isset($_POST[self::ActionLogout])){
+			return $_POST[self::ActionLogout];
 		}
 		else{
 			return false;
@@ -63,22 +63,20 @@ class UserView{
 	$datetime = $this->getDateTime();
 	$user = $this->model->getLoggedInUser();
 
-	$ret = "<h1>Laboration 2 - Inloggning - al223bn</h1>";
-
-	$ret .= "<h2>$user är nu inloggad!</h2>";
+	$ret = "<h2>$user är nu inloggad!</h2>";
 	
 	$ret .= "$this->message";
 
 	$ret .= "
 				<form action='?logout' method='post' >
-				<input type='submit' value='Logga ut' name='UserView::logout'>
+				<input type='submit' value='Logga ut' name='" . self::ActionLogout . "'>
 				</form>
 			";		
 
 	$ret .= "<p>$datetime</p>";
 
 	return $ret;
-}
+	}
 
 
 }

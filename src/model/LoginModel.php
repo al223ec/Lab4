@@ -1,12 +1,18 @@
 <?php
 
+require_once('src/model/Repository/UserRepository.php'); 
+require_once('src/model/User.php'); 
 
 class LoginModel{
 	private $sessionLoginData = "LoginModel::LoggedInUserName";
 	private $sessionUserAgent;
 	private $username = "Admin";
 	private $password = "Password";
+	private $userRepository; 
 
+	public function __construct(){
+		$this->userRepository = new model\UserRepository();
+	}
 
 	// Kontrollerar om sessions-varibeln är satt vilket betyder att en användare är inloggad.
 	public function userLoggedIn($userAgent){
@@ -69,5 +75,9 @@ class LoginModel{
 	public function logOut(){
 		unset($_SESSION[$this->sessionLoginData]);
 		session_destroy();
+	}
+
+	public function saveUser(\model\User $newUser){
+		return $this->userRepository->addUser($newUser); 
 	}
 }
