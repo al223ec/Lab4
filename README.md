@@ -1,9 +1,13 @@
 Laboration 4
 ====
 
-22/9 Samtliga testfall har gått igenom.
+22/9 Samtliga testfall har gått igenom små skillnader i output mot testfallen.
+Utloggnings prompten försvinner inte, detta pga av att ?logout sparas i adressfältet testfall 2.3
+Saknase en titel tag för att sidan ska valideras mot w3.
+
 
 Mina kommentarer
+------
 Visst strängberoende i view klasserna, har istället implementerat konstanter.
 Saknas namespaces
 Kastas undantag vid fel lösenord jag känner mig lite tveksam till detta. 

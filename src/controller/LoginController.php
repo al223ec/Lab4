@@ -80,27 +80,30 @@ class LoginController{
 		// Generar utdata.
 
 		// Om inloggningen lyckades visa användarfönstret.
-		if($this->model->userLoggedIn($userAgent)){
-			return $this->userview->showUser();
-		}
-		if($this->registeruserview->didUserPressRegister()){
-			return $this->registeruserview->getRegisterForm(); 
-		}
-
-		if($this->registeruserview->didUserPressSaveNewUser()){
-			$newUser = $this->registeruserview->getNewUser(); 
-			if($this->model->saveUser($newUser)){
-				$this->loginview->showStatus("Registrering av ny användare lyckades " . $newUser->getUserName());
-				$this->loginview->showLogin();
+			if($this->model->userLoggedIn($userAgent)){
+				return $this->userview->showUser();
 			}
-			else{
+
+			//Min kod
+			if($this->registeruserview->didUserPressRegister()){
 				return $this->registeruserview->getRegisterForm(); 
 			}
+
+			if($this->registeruserview->didUserPressSaveNewUser()){
+				$newUser = $this->registeruserview->getNewUser(); 
+
+				if($newUser !== null && $this->model->saveUser($newUser)){
+					$this->loginview->showStatus("Registrering av ny användare lyckades " . $newUser->getUserName());
+					return $this->loginview->showLogin();
+				}
+				else if($newUser !== null){
+					return $this->registeruserview->getRegisterForm("Registrering av ny användare misslyckades"); 
+				} else {
+					return $this->registeruserview->getRegisterForm("Registrering av ny användare misslyckades"); 
+				}
+
 		}
 		// Annars visa inloggningsfönstret.
-		else{
-
-			return $this->registeruserview->getRegisterLink() . $this->loginview->showLogin();
-		}
+		return $this->registeruserview->getRegisterLink() . $this->loginview->showLogin();
 	}
 }

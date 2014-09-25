@@ -4,10 +4,9 @@ require_once('src/model/Repository/UserRepository.php');
 require_once('src/model/User.php'); 
 
 class LoginModel{
+
 	private $sessionLoginData = "LoginModel::LoggedInUserName";
 	private $sessionUserAgent;
-	private $username = "Admin";
-	private $password = "Password";
 	private $userRepository; 
 
 	public function __construct(){
@@ -16,7 +15,6 @@ class LoginModel{
 
 	// Kontrollerar om sessions-varibeln är satt vilket betyder att en användare är inloggad.
 	public function userLoggedIn($userAgent){
-
 		if(isset($_SESSION[$this->sessionLoginData]) && $_SESSION[$this->sessionUserAgent] === $userAgent){
 			return true;
 		}
@@ -33,8 +31,12 @@ class LoginModel{
 	// Kontrollerar att inmatat användarnamn och lösenord stämmer vid eventuell inloggning.
 	public function checkLogin($clientUsername, $clientPassword, $userAgent){
 
-		if($clientUsername === $this->username && ($clientPassword === $this->password) ){
-
+		//Häma användare från DB
+		$user = $this->userRepository->getUserWithUserName($clientUsername); 
+		if($user !== null){
+			$user->validate($clientPassword); 
+		}
+		if($user !== null && $user->isValid()){
 			// Sparar ner den inloggad användaren till sessionen.
 			$_SESSION[$this->sessionUserAgent] = $userAgent;
 			$_SESSION[$this->sessionLoginData] = $clientUsername;		
@@ -48,21 +50,19 @@ class LoginModel{
 	// Kontrollerar att inmatat användarnamn och lösenord stämmer vid eventuell inloggning + (med kakor och förfallodatumskontroll).
 	public function checkLoginWithCookies($clientUsername, $clientPassword, $userAgent){
 		$time = $this->loadCookieTime();
-		if($clientUsername === $this->username &&  $clientPassword === md5($this->password) && $time > time()){
-
-			// Sparar ner den inloggad användaren till sessionen.
-			$_SESSION[$this->sessionUserAgent] = $userAgent;
-			$_SESSION[$this->sessionLoginData] = $clientUsername;		
-			return true;
+		if($time > time()){
+			throw new \Exception("Felaktigt information i kakan!");	
 		}
-		else{
+		try{
+			$this->checkLogin($clientUsername, $clientPassword, $userAgent); 
+		}catch(\Exception $e){
 			throw new \Exception("Felaktigt information i kakan!");
 		}
 	}
 
 	// Hjälpfunktion för att spara till fil.
-	public function saveCookieTime($value){
-		file_put_contents("CookieTime", $value);
+	public function saveCookieTime($userName, $value){
+		$this->userRepository->saveCookieTime($userName, $value); 
 	}
 
 	// Hjälpfunktion för att ladda från fil.
@@ -78,6 +78,16 @@ class LoginModel{
 	}
 
 	public function saveUser(\model\User $newUser){
-		return $this->userRepository->addUser($newUser); 
+		if($this->userRepository->getUserWithUserName($newUser->getUserName() === null)){
+			return $this->userRepository->addUser($newUser); 
+		}else{
+			return false; 
+		}
+	}
+	/**
+	*True if exists
+	*/
+	public function ceckIfUserNameExists($userName){
+		return $this->userRepository->getUserWithUserName($userName) === null;
 	}
 }

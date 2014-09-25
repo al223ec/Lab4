@@ -31,7 +31,7 @@ class UserRepository Extends Repository{
 		}
 	}
 
-	public function getUser($userName){
+	public function getUserWithUserName($userName){
 		try{
 			$ret = null; 
 			$sql = "SELECT * FROM " . self::$TBL_NAME . " WHERE userName = " . $this->userNameParam;  
@@ -47,7 +47,9 @@ class UserRepository Extends Repository{
 				throw new \Exception("SQL Execute Error"); 
 			} 
 			if($response = $sth->fetch(\PDO::FETCH_OBJ)){
-				$ret = new User($response->userID, $response->userName, $response->passwordHash); 				
+				$ret = new User($response->userID); 
+				$ret->setUserName($response->userName); 
+				$ret->setPasswordHash($response->passwordHash); 				
 			} 
 			return $ret; 
 		}
@@ -55,6 +57,8 @@ class UserRepository Extends Repository{
 			return null; 
 		}
 	}
+
+	
 
 
 }

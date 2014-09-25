@@ -1,0 +1,12 @@
+.wrapper{
+   width:960px;
+   margin:0 auto;
+   text-align:left;
+}
+.errormessage{
+	font-size: 10px; 
+	color: red; 
+}
+label{
+	width: 180px; 
+}

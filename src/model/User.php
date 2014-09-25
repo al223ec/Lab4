@@ -2,29 +2,30 @@
 
 namespace model; 
 
+require_once('src/config/Config.php');  
+
 class User{
 
 	private $userID; 
 	private $userName; 
 	private $passwordHash; 
 	private $valid; 
+	private $errors; 
 
-	public function __construct($userID = 0, $userName, $passwordHash){
-		if($userID === 0){
-			$this->passwordHash = $this->createHash($passwordHash); 
-		}else{
-			$this->passwordHash = $passwordHash; 
-		} 
-		$this->userName = $userName; 
-		$this->userID = $userID; 
+	public function __construct($userID = 0){
+		$this->userID = $userID;  
+		$this->errors = array(); 
 		$this->valid = false; 
-	} 
-
+	}
 	public function validate($password){
-		if($crypt($password, $this->passwordHash) === $this->passwordHash ){
+		if(crypt($password, $this->passwordHash) === $this->passwordHash ){
 			$this->valid = true; 
-		}else{
+		} else{
 			$this->valid = false; 
+		}
+		var_dump($password === $this->passwordHash); 
+		if($password === $this->passwordHash){
+			$this->valid = true; 
 		}
 		return $this->valid; 
 	}
@@ -47,6 +48,28 @@ class User{
 	}
 	public function getPasswordHash(){
 		return $this->passwordHash; 
+	}
+	public function setUserName($userName){
+		$this->userName = $userName;
+	}
+	
+	public function setPasswordHash($passwordHash){
+		$this->passwordHash = $passwordHash; 
+	}
+	public function setPassword($password){
+		if(strlen($password) < \config\Config::PasswordMinLength){
+			throw new \Exception("User::setPassword to short password!"); 
+		} 
+		if($this->userID === 0){
+			$this->passwordHash = $this->createHash($password); 
+
+		}else {
+			throw new Exception("User::setPassword can only be used on new User objects!"); 
+		}
+	}
+
+	public function getErrors(){
+
 	}
 
 }
