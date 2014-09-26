@@ -1,6 +1,7 @@
 <?php
 
 require_once("CookieService.php");
+require_once("src/config/Config.php");
 
 class LoginView{
 	
@@ -12,7 +13,7 @@ class LoginView{
 	private $message;								// Privat variabel för att visa fel/rättmeddelanden.
 
 	//Min uppdatering ta bort strängberoende
-	const ActionLogin = "LoginView::login"; 
+	const ActionLogin = "Auth/login"; 
 	const RememberMe = "LoginView::checked"; 
 	
 	public function __construct(LoginModel $model){
@@ -21,16 +22,6 @@ class LoginView{
 		$this->model = $model;
 		$this->cookieUsername = new CookieService();
 		$this->cookiePassword = new CookieService();
-	}
-
-	// Kontrollerar om användare tryckt på Logga in.
-	public function didUserPressLogin()	{
-		if(isset($_POST[self::ActionLogin])){
-			return $_POST[self::ActionLogin];
-		}
-		else{
-			return false;
-		}
 	}
 
 	// Kontrollerar användare checkat i Håll mig inloggad.
@@ -78,22 +69,22 @@ class LoginView{
 	// Hämtar Användarnamnet vid rätt input.
 	public function getUsername(){
 
-		if (empty($_POST["$this->username"])) {
+		if (empty($_POST[$this->username])) {
 			throw new \Exception("Användarnamn saknas!");
 		}
 		else {
-			return $_POST["$this->username"];	
+			return $_POST[$this->username];	
 		}
 	}
 
 	// Hämtar lösenordet vid rätt input.
 	public function getPassword(){
 
-		if (empty($_POST["$this->password"])) {
+		if (empty($_POST[$this->password])) {
 			throw new \Exception("Lösenord saknas!");	
 		}
 		else {
-			return $_POST["$this->password"];	
+			return $_POST[$this->password];	
 		}
 	}
 
@@ -138,7 +129,7 @@ class LoginView{
 		$ret .= "<p>$this->message";
 
 		$ret .= "
-				<form action='?login' method='post' >";
+				<form action='". \config\Config::AppRoot . self::ActionLogin ."' method='post' >";
 
 		// Om det inte finns något inmatat användarnamn så visa tom input.
 		if(empty($_POST[$this->username])){

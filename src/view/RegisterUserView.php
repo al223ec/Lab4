@@ -5,10 +5,10 @@ require_once('src/config/Config.php');
 
 class RegisterUserView{
 	
-	private $loginmodel; 
+	private $registermodel; 
 
-	const ActionRegister = "RegisterUserView::Register"; 
-	const ActionSaveNewUser = "RegisterUserView::SaveNewUser"; 
+	const ActionRegister = "RegisterUser/"; 
+	const ActionSaveNewUser = "RegisterUser/SaveNewUser"; 
 	
 	private $userName = "RegisterUserView::UserName";	
 	private $password = "RegisterUserView::Password";	
@@ -19,8 +19,8 @@ class RegisterUserView{
 	const PasswordErrorKey = "PasswordError"; 
 	const UserNameErrorKey = "UserNameError"; 
 
-	public function __construct(LoginModel $loginmodel){
-		$this->loginmodel = $loginmodel; 
+	public function __construct(RegisterUserModel $registermodel){
+		$this->registermodel = $registermodel; 
 		$this->errorMessages = array(); 
 	}
 
@@ -40,7 +40,7 @@ class RegisterUserView{
 			$ret = ""; 
 		}else if($ret === ""){
 			$this->errorMessages[self::UserNameErrorKey] = "Användarnamnet saknas";
-		} else if($this->loginmodel->ceckIfUserNameExists($ret)){
+		} else if($this->registermodel->ceckIfUserNameExists($ret)){
 			$this->errorMessages[self::UserNameErrorKey] = "Användarnamnet finns redan";
 		}
 		//Kontrollera om användarnamnet är taget!!!
@@ -48,7 +48,6 @@ class RegisterUserView{
 	}
 
 	private function getPassword(){
-
 		$ret = $this->getCleanInput($this->password);
 		if($ret === ""){
 			$this->errorMessages[self::PasswordErrorKey] = "Lösenordet saknas";
@@ -79,7 +78,7 @@ class RegisterUserView{
 
 
 	public function getRegisterLink(){
-		return "<a href='?". self::ActionRegister ."'> Registrera ny användare </a>"; 
+		return "<a href='". \config\Config::AppRoot . self::ActionRegister ."'> Registrera ny användare </a>"; 
 	}
 
 	public function getRegisterForm($prompt = ""){
@@ -88,7 +87,7 @@ class RegisterUserView{
 				<fieldset>
 				<legend>Registrera ny användare - skriv in användarnamn och lösenord</legend>
 				<p> ". $prompt . "
-				<form action='?" . self::ActionSaveNewUser . "' method='post' >
+				<form action='". \config\Config::AppRoot . self::ActionSaveNewUser . "' method='post' >
 				<fieldset>
 					<label for='RegisterUserNameID' >Namn  :</label>
 					<input type='text' name='" . $this->userName . "' id='RegisterUserNameID'>"

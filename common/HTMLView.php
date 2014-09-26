@@ -11,8 +11,8 @@ class HTMLView{
 			<html>
 			<head>
 				<meta charset='UTF-8'>
-				<link href='css/bootstrap.min.css' rel='stylesheet'>
-				<link href='css/style.css' rel='stylesheet'>
+				<link href='/lab4/css/bootstrap.min.css' rel='stylesheet'>
+				<link href='/lab4/css/style.css' rel='stylesheet'>
 				<title> Lab 4 - Anton Ledström </title>
 			</head>
 			<body>

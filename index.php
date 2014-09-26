@@ -3,13 +3,9 @@
 session_start();
 
 require_once("common/HTMLView.php");
-require_once("src/controller/LoginController.php");
-require_once("src/model/LoginModel.php");
-require_once("src/view/LoginView.php");
+require_once("core/Main.php"); 
+require_once("core/Router.php"); 
 
-
-$doC = new LoginController();
-$htmlBody = $doC->doControll();
-
+$router = new Router();  
 $view = new  HTMLView();
-$view->echoHTML($htmlBody);
+$view->echoHTML(Main::dispatch($router));

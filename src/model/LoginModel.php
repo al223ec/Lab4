@@ -5,7 +5,7 @@ require_once('src/model/User.php');
 
 class LoginModel{
 
-	private $sessionLoginData = "LoginModel::LoggedInUserName";
+	private $sessionLoginData = "LoginModel::LoggedInUser";
 	private $sessionUserAgent;
 	private $userRepository; 
 
@@ -25,13 +25,13 @@ class LoginModel{
 
 	// Hämtar vilken användare som är inloggad.
 	public function getLoggedInUser(){
-		return $_SESSION[$this->sessionLoginData];
+		return isset($_SESSION[$this->sessionLoginData]) ? $_SESSION[$this->sessionLoginData] : null;
 	}
 
 	// Kontrollerar att inmatat användarnamn och lösenord stämmer vid eventuell inloggning.
 	public function checkLogin($clientUsername, $clientPassword, $userAgent){
 
-		//Häma användare från DB
+		//Hämta användare från DB
 		$user = $this->userRepository->getUserWithUserName($clientUsername); 
 		if($user !== null){
 			$user->validate($clientPassword); 
@@ -39,7 +39,7 @@ class LoginModel{
 		if($user !== null && $user->isValid()){
 			// Sparar ner den inloggad användaren till sessionen.
 			$_SESSION[$this->sessionUserAgent] = $userAgent;
-			$_SESSION[$this->sessionLoginData] = $clientUsername;		
+			$_SESSION[$this->sessionLoginData] = $user;		
 			return true;
 		}
 		else{
@@ -61,7 +61,7 @@ class LoginModel{
 	}
 
 	// Hjälpfunktion för att spara till fil.
-	public function saveCookieTime($userName, $value){
+	public function saveCookieTime($value){
 		$this->userRepository->saveCookieTime($userName, $value); 
 	}
 
@@ -77,17 +77,4 @@ class LoginModel{
 		session_destroy();
 	}
 
-	public function saveUser(\model\User $newUser){
-		if($this->userRepository->getUserWithUserName($newUser->getUserName() === null)){
-			return $this->userRepository->addUser($newUser); 
-		}else{
-			return false; 
-		}
-	}
-	/**
-	*True if exists
-	*/
-	public function ceckIfUserNameExists($userName){
-		return $this->userRepository->getUserWithUserName($userName) === null;
-	}
 }

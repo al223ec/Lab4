@@ -60,22 +60,22 @@ class UserView{
 
 	// Slutlig presentation av utdata.
 	public function showUser(){
-	$datetime = $this->getDateTime();
-	$user = $this->model->getLoggedInUser();
+		$datetime = $this->getDateTime();
+		$user = $this->model->getLoggedInUser();
 
-	$ret = "<h2>$user är nu inloggad!</h2>";
-	
-	$ret .= "$this->message";
+		$ret = "<h2>$user är nu inloggad!</h2>";
+		
+		$ret .= "$this->message";
 
-	$ret .= "
-				<form action='?logout' method='post' >
-				<input type='submit' value='Logga ut' name='" . self::ActionLogout . "'>
-				</form>
-			";		
+		$ret .= "
+					<form action='?logout' method='post' >
+					<input type='submit' value='Logga ut' name='" . self::ActionLogout . "'>
+					</form>
+				";		
 
-	$ret .= "<p>$datetime</p>";
+		$ret .= "<p>$datetime</p>";
 
-	return $ret;
+		return $ret;
 	}
 
 
