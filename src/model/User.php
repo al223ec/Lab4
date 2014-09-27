@@ -71,6 +71,7 @@ class User{
 	public function getErrors(){
 
 	}
+	
 	public function __toString(){
 		return $this->userName;
     }

@@ -3,7 +3,7 @@
 require_once("CookieService.php");
 require_once("src/config/Config.php");
 
-class LoginView{
+class AuthView{
 	
 	private $model;
 	private $cookieUsername;						// Instans av CookieStorage för att lagra användarnamn.
@@ -16,7 +16,11 @@ class LoginView{
 	const ActionLogin = "Auth/login"; 
 	const RememberMe = "LoginView::checked"; 
 	
-	public function __construct(LoginModel $model){
+	private $errorMessages; 
+
+
+	public function __construct(\model\AuthModel $model){
+		$this->errorMessages = array();
 
 		// Struktur för MVC.
 		$this->model = $model;
@@ -26,22 +30,12 @@ class LoginView{
 
 	// Kontrollerar användare checkat i Håll mig inloggad.
 	public function RememberMeIsFilled(){
-		if(isset($_POST[self::RememberMe])){
-			return true;
-		}
-		else{
-			return false;
-		}
+		return isset($_POST[self::RememberMe]); 
 	}
 
 	// Funktion för att hämta sparade kakor.
 	public function userIsRemembered(){
-		if ($this->cookieUsername->loadCookie($this->username) && $this->cookiePassword->loadCookie($this->password)) {
-			return true;
-		}
-		else{
-			return false;
-		}
+		return $this->cookieUsername->loadCookie($this->username) && $this->cookiePassword->loadCookie($this->password);
 	}
 
 	// Funktion för att spara kakor (och spara ner förfallotid).
@@ -120,7 +114,8 @@ class LoginView{
 
 		$datetime = $this->getDateTime();
 
-		$ret = "<h2>Ej inloggad!</h2>";
+		$ret = RegisterUserView::getRegisterLink(); 
+		$ret .= "<h2>Ej inloggad!</h2>";
 
 		$ret .= "
 				<fieldset>

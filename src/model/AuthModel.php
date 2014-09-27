@@ -1,16 +1,18 @@
 <?php
 
+namespace model; 
+
 require_once('src/model/Repository/UserRepository.php'); 
 require_once('src/model/User.php'); 
 
-class LoginModel{
+class AuthModel{
 
 	private $sessionLoginData = "LoginModel::LoggedInUser";
 	private $sessionUserAgent;
 	private $userRepository; 
 
 	public function __construct(){
-		$this->userRepository = new model\UserRepository();
+		$this->userRepository = new UserRepository();
 	}
 
 	// Kontrollerar om sessions-varibeln är satt vilket betyder att en användare är inloggad.
@@ -43,6 +45,8 @@ class LoginModel{
 			return true;
 		}
 		else{
+			return false; 
+
 			throw new \Exception("Felaktigt användarnamn och/eller lösenord!");
 		}
 	}

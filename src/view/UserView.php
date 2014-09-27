@@ -6,21 +6,12 @@ class UserView{
 	private $message;
 
 	//Min uppdatering ta bort sträng beroende
-	const ActionLogout = "UserView::logout"; 
+	const ActionLogout = "Auth\Logout"; 
 
-	public function __construct(LoginModel $model){
+	public function __construct(\model\AuthModel $model){
 		$this->model = $model;
 	}
 
-	// Kontrollerar om användaren tryckt på Logga ut.
-	public function didUserPressLogout(){
-		if(isset($_POST[self::ActionLogout])){
-			return $_POST[self::ActionLogout];
-		}
-		else{
-			return false;
-		}
-	}
 
 	// Datum och tid-funktion. (Kan brytas ut till en hjälpfunktion.)
 	public function getDateTime(){
@@ -68,8 +59,8 @@ class UserView{
 		$ret .= "$this->message";
 
 		$ret .= "
-					<form action='?logout' method='post' >
-					<input type='submit' value='Logga ut' name='" . self::ActionLogout . "'>
+					<form action='". \config\Config::AppRoot  . self::ActionLogout . "' method='post' >
+					<input type='submit' value='Logga ut' name=''>
 					</form>
 				";		
 

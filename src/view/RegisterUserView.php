@@ -19,7 +19,7 @@ class RegisterUserView{
 	const PasswordErrorKey = "PasswordError"; 
 	const UserNameErrorKey = "UserNameError"; 
 
-	public function __construct(RegisterUserModel $registermodel){
+	public function __construct(\model\RegisterUserModel $registermodel){
 		$this->registermodel = $registermodel; 
 		$this->errorMessages = array(); 
 	}
@@ -77,7 +77,7 @@ class RegisterUserView{
 	}
 
 
-	public function getRegisterLink(){
+	public static function getRegisterLink(){
 		return "<a href='". \config\Config::AppRoot . self::ActionRegister ."'> Registrera ny användare </a>"; 
 	}
 
