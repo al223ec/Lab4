@@ -9,8 +9,12 @@ class User{
 	private $userID; 
 	private $userName; 
 	private $passwordHash; 
+	private $cookieValue; 
+	private $cookieTime; 
+
 	private $valid; 
 	private $errors; 
+
 
 	public function __construct($userID = 0){
 		$this->userID = $userID;  
@@ -23,7 +27,6 @@ class User{
 		} else{
 			$this->valid = false; 
 		}
-		var_dump($password === $this->passwordHash); 
 		if($password === $this->passwordHash){
 			$this->valid = true; 
 		}
@@ -50,6 +53,9 @@ class User{
 		return $this->passwordHash; 
 	}
 	public function setUserName($userName){
+		if(strlen($userName) < \config\Config::UserNameMinLength){
+			throw new \Exception("User::setUserName to short user name!"); 
+		} 
 		$this->userName = $userName;
 	}
 	
@@ -68,11 +74,28 @@ class User{
 		}
 	}
 
+	public function validateByCookieValue($cookieValue){
+		$this->valid = $this->cookieValue === $cookieValue && $this->cookieTime > time(); 
+		return $this->valid; 
+
+	}
 	public function getErrors(){
 
 	}
 	
 	public function __toString(){
 		return $this->userName;
+    }
+
+    public function setCookieTime($cookieTime){
+    	$this->cookieTime = $cookieTime; 
+    }
+
+    public function setCookieValue($cookieValue){
+    	$this->cookieValue = $cookieValue; 
+    }
+
+    public function getCookieTime(){
+    	return $this->cookieTime; 
     }
 }

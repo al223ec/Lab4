@@ -48,8 +48,11 @@ class UserRepository Extends Repository{
 			} 
 			if($response = $sth->fetch(\PDO::FETCH_OBJ)){
 				$ret = new User($response->userID); 
+
 				$ret->setUserName($response->userName); 
 				$ret->setPasswordHash($response->passwordHash); 				
+				$ret->setCookieValue($response->cookieValue); 
+				$ret->setCookieTime($response->cookieTime);
 			} 
 			return $ret; 
 		}
@@ -58,7 +61,30 @@ class UserRepository Extends Repository{
 		}
 	}
 
-	
+	public function saveCookieValue($userID, $cookieValue, $cookieTime){
+		try{
+			$sql = "UPDATE " . self::$TBL_NAME . " SET cookieValue = ?, cookieTime = ? WHERE UserID = ?";
+			$sth = $this->pdo->prepare($sql);
 
+	        if ($sth === FALSE) {
+	            throw new \Exception("prepare of $sql failed " . $this->pdo->errorInfo());
+	        }	
+			
+			$sth->bindParam(1, $cookieValue, \PDO::PARAM_STR); 
+			$sth->bindParam(2, $cookieTime, \PDO::PARAM_INT); 
+			$sth->bindParam(3, $userID, \PDO::PARAM_INT); 
 
+	        if ($sth->execute() === FALSE) {
+	            throw new \Exception("execute of $sql failed " . $this->pdo->errorInfo());
+	        }
+	        return true; 
+		}
+		catch(\Exception $ex){
+			return false; 
+		}
+	}
+
+	public function resetCookieValues($userID){
+		return $this->saveCookieValue($userID, null, 0); 
+	}
 }

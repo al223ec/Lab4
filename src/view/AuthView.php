@@ -15,19 +15,21 @@ class AuthView{
 	//Min uppdatering ta bort strängberoende
 	const ActionLogin = "Auth/login"; 
 	const RememberMe = "LoginView::checked"; 
-	
-	private $errorMessages; 
-
 
 	public function __construct(\model\AuthModel $model){
-		$this->errorMessages = array();
-
 		// Struktur för MVC.
 		$this->model = $model;
 		$this->cookieUsername = new CookieService();
 		$this->cookiePassword = new CookieService();
 	}
 
+	public function populateErrorMessage($user){
+		if($user === null){ 
+			$this->message = "Felaktigt användarnamn"; 	
+		} else if(!$user->isValid()){
+			$this->message = "Felaktigt lösenord"; 
+		}
+	}
 	// Kontrollerar användare checkat i Håll mig inloggad.
 	public function RememberMeIsFilled(){
 		return isset($_POST[self::RememberMe]); 
@@ -39,9 +41,9 @@ class AuthView{
 	}
 
 	// Funktion för att spara kakor (och spara ner förfallotid).
-	public function saveToCookies($username, $password){
+	public function saveToCookies($username){
 		$this->cookieUsername->saveCookie($this->username, $username);
-		$this->model->saveCookieTime($this->cookiePassword->saveCookie($this->password, $password));
+		$this->model->saveCookieValue($this->cookiePassword->saveCookie($this->password), $this->cookiePassword->getCookieExpiration());
 	}
 
 	// Funktion för att radera sparade kakor.
@@ -62,9 +64,9 @@ class AuthView{
 
 	// Hämtar Användarnamnet vid rätt input.
 	public function getUsername(){
-
 		if (empty($_POST[$this->username])) {
-			throw new \Exception("Användarnamn saknas!");
+			$this->message = "Användarnamn saknas!";
+			return ""; 
 		}
 		else {
 			return $_POST[$this->username];	
@@ -73,9 +75,13 @@ class AuthView{
 
 	// Hämtar lösenordet vid rätt input.
 	public function getPassword(){
-
 		if (empty($_POST[$this->password])) {
-			throw new \Exception("Lösenord saknas!");	
+			if(!$this->message){
+				$this->message = "Lösenord saknas!";	
+			}else{
+				$this->message .= " Lösenord saknas!";		
+			}
+			return ""; 
 		}
 		else {
 			return $_POST[$this->password];	
@@ -94,6 +100,7 @@ class AuthView{
 	}
 
 	// Visar fel/rättmeddelanden.
+	/*
 	public function showStatus($message){
 		if (isset($message)) {
 			$this->message = $message;
@@ -107,13 +114,18 @@ class AuthView{
 	public function successfullLogOut(){
 		$this->showStatus("Du har nu loggat ut!");
 	}
-
+*/
+	public function setMessage($message){
+		$this->message = $message; 
+	}
 
 	// Slutlig presentation av utdata.
-	public function showLogin(){
+	public function showLogin($displayLogoutMessage = false){
 
+		if($displayLogoutMessage){
+			$this->message = "Du har nu loggat ut!"; 
+		}
 		$datetime = $this->getDateTime();
-
 		$ret = RegisterUserView::getRegisterLink(); 
 		$ret .= "<h2>Ej inloggad!</h2>";
 
@@ -121,21 +133,16 @@ class AuthView{
 				<fieldset>
 				<legend>Logga in här!</legend>";
 
-		$ret .= "<p>$this->message";
+		$ret .= "<p>$this->message</p>";
 
 		$ret .= "
 				<form action='". \config\Config::AppRoot . self::ActionLogin ."' method='post' >";
-
+		
 		// Om det inte finns något inmatat användarnamn så visa tom input.
-		if(empty($_POST[$this->username])){
-			$ret .= "Användarnamn: <input type='text' name='$this->username'>";
-		}
 		// Annars visa det tidigare inmatade användarnamnet i input.
-		else{
-			$uservalue = $_POST[$this->username];
-			$ret .= "Användarnamn: <input type='text' name='$this->username' value='$uservalue'>";
-		}
-
+		$uservalue = empty($_POST[$this->username]) ? "" : $_POST[$this->username]; 
+		$ret .= "Användarnamn: <input type='text' name='$this->username' value='$uservalue'>";
+	
 		$ret .= "
 					Lösenord: <input type='text' name='$this->password'>
 					Håll mig inloggad: <input type='checkbox' name='LoginView::checked'>

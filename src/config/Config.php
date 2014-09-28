@@ -2,12 +2,19 @@
 
 namespace config; 
 
-class Config{
+abstract class Config{
 	const UserNameMinLength = 3; 
 	const PasswordMinLength = 6;  
 	const AppRoot = "/lab4/"; 
 
-	function __construct(){
-		throw new Exception("Don't create objects of this type", 1);
-	}
+	public static $ErrorMessages = Array(
+		"WrongUserName" => "", 
+		"WrongPassword" => "",
+		); 
+	const ErrorMessageWrongUserName = "";
+	const ErrorMessageWrongPassword = ""; 
+	const ErrorMessageNoUserName = ""; 
+	const ErrorMessageNoPasword = ""; 
+
+
 }

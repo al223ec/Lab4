@@ -8,7 +8,7 @@ require_once('src/model/User.php');
 class AuthModel{
 
 	private $sessionLoginData = "LoginModel::LoggedInUser";
-	private $sessionUserAgent;
+	private $sessionUserAgent = "LoginModel::UserAgent";
 	private $userRepository; 
 
 	public function __construct(){
@@ -17,12 +17,7 @@ class AuthModel{
 
 	// Kontrollerar om sessions-varibeln är satt vilket betyder att en användare är inloggad.
 	public function userLoggedIn($userAgent){
-		if(isset($_SESSION[$this->sessionLoginData]) && $_SESSION[$this->sessionUserAgent] === $userAgent){
-			return true;
-		}
-		else{
-			return false;
-		}
+		return isset($_SESSION[$this->sessionLoginData]) && $_SESSION[$this->sessionUserAgent] === $userAgent;
 	}
 
 	// Hämtar vilken användare som är inloggad.
@@ -31,8 +26,10 @@ class AuthModel{
 	}
 
 	// Kontrollerar att inmatat användarnamn och lösenord stämmer vid eventuell inloggning.
+	/** 
+	* @return User or null 
+	*/
 	public function checkLogin($clientUsername, $clientPassword, $userAgent){
-
 		//Hämta användare från DB
 		$user = $this->userRepository->getUserWithUserName($clientUsername); 
 		if($user !== null){
@@ -40,45 +37,52 @@ class AuthModel{
 		}
 		if($user !== null && $user->isValid()){
 			// Sparar ner den inloggad användaren till sessionen.
-			$_SESSION[$this->sessionUserAgent] = $userAgent;
-			$_SESSION[$this->sessionLoginData] = $user;		
-			return true;
+			$this->saveUserToSession($user, $userAgent); 
+	
 		}
-		else{
-			return false; 
+		return $user; 	
+	}
 
-			throw new \Exception("Felaktigt användarnamn och/eller lösenord!");
-		}
+	private function saveUserToSession($user, $userAgent){
+		$_SESSION[$this->sessionUserAgent] = $userAgent;
+		$_SESSION[$this->sessionLoginData] = $user;	
+
 	}
 
 	// Kontrollerar att inmatat användarnamn och lösenord stämmer vid eventuell inloggning + (med kakor och förfallodatumskontroll).
-	public function checkLoginWithCookies($clientUsername, $clientPassword, $userAgent){
-		$time = $this->loadCookieTime();
-		if($time > time()){
-			throw new \Exception("Felaktigt information i kakan!");	
+	public function checkLoginWithCookies($clientUsername, $cookieValue, $userAgent){
+		$user = $this->userRepository->getUserWithUserName($clientUsername); 
+		$user->validateByCookieValue($cookieValue); 
+		
+		if($user->getCookieTime() < time()){
+			return null; 
 		}
-		try{
-			$this->checkLogin($clientUsername, $clientPassword, $userAgent); 
-		}catch(\Exception $e){
-			throw new \Exception("Felaktigt information i kakan!");
+		if($user->isValid()){
+			$this->saveUserToSession($user, $userAgent); 
+			return $user; 
 		}
+		return null; 
 	}
 
 	// Hjälpfunktion för att spara till fil.
-	public function saveCookieTime($value){
-		$this->userRepository->saveCookieTime($userName, $value); 
+	public function saveCookieValue($value, $cookieTime){
+		$userID = $this->getLoggedInUser() !== null ? $this->getLoggedInUser()->getUserID() : 0; 
+		$this->userRepository->saveCookieValue($userID, $value, $cookieTime); 
 	}
 
-	// Hjälpfunktion för att ladda från fil.
-	public function loadCookieTime(){
-		return file_get_contents("CookieTime");
-	}
-
-
-	// Unsettar sessionsvariabeln och dödar sessionen vid eventuell utloggning.
+	// Unsettar sessionsvariabeln 
+	/**
+	* @return True om det finns en session
+	*/
 	public function logOut(){
+		$ret = isset($_SESSION[$this->sessionLoginData]); 
+		if($ret){
+			$this->userRepository->resetCookieValues($this->getLoggedInUser()->getUserID()); 
+		}
 		unset($_SESSION[$this->sessionLoginData]);
-		session_destroy();
+		unset($_SESSION[$this->sessionUserAgent]);
+
+		return $ret; 
 	}
 
 }

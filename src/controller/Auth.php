@@ -25,13 +25,12 @@ class Auth extends Controller{
 	public function main(){
 		$userAgent = $this->helpers->getUserAgent();
 		if($this->authView->userIsRemembered() and !$this->authModel->userLoggedIn($userAgent)){
-			try {
-				// Hämtar de lagrade kakorna, kontrollerar och jämför dem med sparad data.
-				$this->authModel->checkLoginWithCookies($this->authView->getUsernameCookie(), $this->authView->getPasswordCookie(), $userAgent);
+			$loggedInUser = $this->authModel->checkLoginWithCookies($this->authView->getUsernameCookie(), $this->authView->getPasswordCookie(), $userAgent); 
+
+			if($loggedInUser !== null && $loggedInUser->isValid()){
 				$this->userView->successfullLogInWithCookiesLoad();						
-			} catch (Exception $e) {
+			} else{
 				$this->authView->forgetRememberedUser();
-				$this->authView->showStatus($e->getMessage());
 			}
 		}
 
@@ -43,34 +42,34 @@ class Auth extends Controller{
 
 	public function login(){
 		$userAgent = $this->helpers->getUserAgent();	
-		try {
 			// Hämtar användarnamn och lösenord.
-			$clientUsername = $this->authView->getUsername();
-			$clientPassword = $this->authView->getPassword();		
-			
-			// Kontrollerar om användarnamn och lösenord överensstämmer med sparad data.
-			$this->authModel->checkLogin($clientUsername, $clientPassword, $userAgent);
+		$clientUsername = $this->authView->getUsername();
+		$clientPassword = $this->authView->getPassword();		
+		$user = null; 
 
+		// Kontrollerar om användarnamn och lösenord överensstämmer med sparad data.
+		if($clientUsername !== ""){
+			$user = $this->authModel->checkLogin($clientUsername, $clientPassword, $userAgent);
+		}		
+		if($user !== null && $user->isValid()){
 			// Om "Håll mig inloggad" är ikryssad, spara i cookies.
 			if ($this->authView->RememberMeIsFilled()) {
 				$this->authView->saveToCookies($clientUsername, $clientPassword);
-				$this->userview->successfullLogInWithCookiesSaved();
+				$this->userView->successfullLogInWithCookiesSaved(); 
 			}
 			else{
-				$this->userview->successfullLogIn();	
+				$this->userView->successfullLogIn();
 			}
-		// Felmeddelande vid eventuella fel i try-satsen.
-		} catch (Exception $e) {
-			$this->authView->showStatus($e->getMessage());
-			return $this->authView->showLogin();	
+			return $this->userView->showUser();; 	
+		} else if($clientUsername !== ""){
+			$this->authView->populateErrorMessage($user);
 		}
-		return $this->userview->showUser();; 
+		return $this->authView->showLogin();
 	}
 
 	public function logout(){
 		$this->authView->forgetRememberedUser();
-		$this->authModel->logOut();	
-		$this->authView->successfullLogOut();
-		return $this->authView->showLogin(); 
+		$displayLogoutMessage = $this->authModel->logOut();	
+		return $this->authView->showLogin($displayLogoutMessage); 
 	}
 }
