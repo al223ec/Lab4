@@ -1,53 +1,56 @@
 <?php
 
+namespace view; 
+
 require_once('src/model/User.php'); 
-require_once('src/config/Config.php');  
+require_once('src/config/Config.php'); 
+require_once('src/view/ViewBase.php'); 
 
-class RegisterUserView{
+class RegisterUserView extends ViewBase{
 	
-	private $registermodel; 
-
-	const ActionRegister = "RegisterUser/"; 
-	const ActionSaveNewUser = "RegisterUser/SaveNewUser"; 
+	const ActionRegister = 		"RegisterUser/"; 
+	const ActionSaveNewUser = 	"RegisterUser/SaveNewUser"; 
 	
-	private $userName = "RegisterUserView::UserName";	
-	private $password = "RegisterUserView::Password";	
-
+	private $userName = 		"RegisterUserView::UserName";	
+	private $password = 		"RegisterUserView::Password";	
 	private $repeatedPassword = "RegisterUserView::RepeatedPassword";	
 
 	private $errorMessages; 
-	const PasswordErrorKey = "PasswordError"; 
-	const UserNameErrorKey = "UserNameError"; 
+	const PasswordErrorKey = 	"PasswordError"; 
+	const UserNameErrorKey = 	"UserNameError"; 
 
-	public function __construct(\model\RegisterUserModel $registermodel){
-		$this->registermodel = $registermodel; 
+	public function __construct(\model\ RegisterUserModel $model){
+		parent::__construct($model);
 		$this->errorMessages = array(); 
 	}
 
-	public function didUserPressRegister(){
-		return isset($_GET[self::ActionRegister]);
+	public function setSuccessMessage($userName){
+		$this->model->setSessionMessage("Registrering av ny användare lyckades " . $userName);
 	}
 
-	public function didUserPressSaveNewUser(){
-		return isset($_GET[self::ActionSaveNewUser]);
+	public function setFailMessage(){
+		$this->model->setSessionMessage("Registrering av ny användare misslyckades fatalt vg försök igen!");
 	}
 
-	private function getUserName(){
+	public function getUserName(){
 		$ret = $this->getCleanInput($this->userName);
-
 		if($ret !== $this->getInput($this->userName)){
 			$this->errorMessages[self::UserNameErrorKey] = "Användarnamnet innehåller ogiltiga tecken!";
 			$ret = ""; 
 		}else if($ret === ""){
 			$this->errorMessages[self::UserNameErrorKey] = "Användarnamnet saknas";
-		} else if($this->registermodel->ceckIfUserNameExists($ret)){
+		}else if($this->model->ceckIfUserNameExists($ret)){
 			$this->errorMessages[self::UserNameErrorKey] = "Användarnamnet finns redan";
+			$ret = ""; 
+		}else if(strlen($ret) < \config\Config::UserNameMinLength){
+			$this->errorMessages[self::UserNameErrorKey] = "Användarnamnet är för kort";
+			$ret = "";
 		}
-		//Kontrollera om användarnamnet är taget!!!
+
 		return $ret; 
 	}
 
-	private function getPassword(){
+	public function getPassword(){
 		$ret = $this->getCleanInput($this->password);
 		if($ret === ""){
 			$this->errorMessages[self::PasswordErrorKey] = "Lösenordet saknas";
@@ -55,25 +58,11 @@ class RegisterUserView{
 		if ($ret !== $this->getCleanInput($this->repeatedPassword)) {
 			$this->errorMessages[self::PasswordErrorKey] = "Lösenorden stämmer inte överens";
 			$ret = "";	
+		}else if(strlen($ret) < \config\Config::PasswordMinLength){
+			$this->errorMessages[self::PasswordErrorKey] = "Lösenordet är för kort!";
+			$ret = "";
 		}
-
 		return $ret; 
-		/*
-		if($ret !== $this->getInput($this->password) || $this->getCleanInput($this->repeatedPassword) !== $this->getInput($this->repeatedPassword)){
-			$this->errorMessages[self::PasswordErrorKey] = "Lösenordet innehåller ogiltiga tecken!";
-			$ret = ""; 
-		}else if($ret === ""){
-			$this->errorMessages[self::PasswordErrorKey] = "Lösenordet saknas";
-		} 
-		if ($ret !== $this->getCleanInput($this->repeatedPassword)) {
-			if(isset($this->errorMessages[self::PasswordErrorKey])){ 
-				$this->errorMessages[self::PasswordErrorKey] .= "Lösenorden stämmer inte överens"; 
-			} else {
-				$this->errorMessages[self::PasswordErrorKey] = "Lösenorden stämmer inte överens";
-			}
-			$ret = ""; 
-		}
-		return $ret; */
 	}
 
 
@@ -81,16 +70,16 @@ class RegisterUserView{
 		return "<a href='". \config\Config::AppRoot . self::ActionRegister ."'> Registrera ny användare </a>"; 
 	}
 
-	public function getRegisterForm($prompt = ""){
+	public function getRegisterForm(){
 		return" 
 				<h2>Ej inloggad, registrera ny användare!</h2>
 				<fieldset>
 				<legend>Registrera ny användare - skriv in användarnamn och lösenord</legend>
-				<p> ". $prompt . "
+				". $this->getMessage() . "
 				<form action='". \config\Config::AppRoot . self::ActionSaveNewUser . "' method='post' >
 				<fieldset>
 					<label for='RegisterUserNameID' >Namn  :</label>
-					<input type='text' name='" . $this->userName . "' id='RegisterUserNameID'>"
+					<input type='text' name='" . $this->userName . "' id='RegisterUserNameID' value=". $this->getInput($this->userName) .">"
 					. $this->getErrorMessages(self::UserNameErrorKey) . 
 					"
 				</fieldset>
@@ -110,30 +99,6 @@ class RegisterUserView{
 				";
 	}
 
-	public function getNewUser(){
-		$userName = $this->getUserName(); 
-		$password = $this->getPassword(); 
-
-		if($userName !== "" && $password !== ""){
-			$newUser = new \model\User(); 
-			
-			$newUser->setUserName($userName); 
-			$newUser->setPassword($password);  
-		} 
-		return null; 
-	}
-
-	private function getInput($inputName){
-		return isset($_POST[$inputName]) ? $_POST[$inputName] : "";
-	}
-	private function getCleanInput($inputName) {
-		return isset($_POST[$inputName]) ? $this->sanitize($_POST[$inputName]) : "";
-	}
-	private function sanitize($input) {
-        $temp = trim($input);
-        return filter_var($temp, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
-    }
-	
 	private function getErrorMessages($key){
 		if (isset($this->errorMessages[$key])) {
 			return "<span class='errormessage'> " . $this->errorMessages[$key] . " </span>"; 
@@ -143,11 +108,12 @@ class RegisterUserView{
 	/** Fuktion för att lägga till errormessages utanför klassen
 	*
 	*/
-	public function addErrorMessage($key, $errorMessage){
+	/*
+	private function addErrorMessage($key, $errorMessage){
 		if($key === self::PasswordError || $key === self::UserNameError){
 			$this->errorMessages[$key] = $errorMessage; 
 		} else { 
 			throw new \Exception("LoginView::addErrorMessage fel nyckel skickad till funktionen!!");
 		}
-	}
+	}*/
 }

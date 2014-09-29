@@ -1,33 +1,35 @@
 <?php
 
-require_once("CookieService.php");
-require_once("src/config/Config.php");
+namespace view; 
 
-class AuthView{
+require_once("src/view/CookieService.php");
+require_once("src/config/Config.php");
+require_once("src/view/ViewBase.php");
+
+class AuthView extends ViewBase{
 	
-	private $model;
 	private $cookieUsername;						// Instans av CookieStorage för att lagra användarnamn.
 	private $cookiePassword;						// Instans av CookieStorage för att lagra lösenord.
 	private $username = "LoginView::Username";		// Användarnamnets kakas namn.
 	private $password = "LoginView::Password";		// Lösenordets kakas namn.
-	private $message;								// Privat variabel för att visa fel/rättmeddelanden.
+	private $errorMessage;								// Privat variabel för att visa fel/rättmeddelanden.
 
 	//Min uppdatering ta bort strängberoende
 	const ActionLogin = "Auth/login"; 
 	const RememberMe = "LoginView::checked"; 
 
 	public function __construct(\model\AuthModel $model){
-		// Struktur för MVC.
-		$this->model = $model;
-		$this->cookieUsername = new CookieService();
-		$this->cookiePassword = new CookieService();
+		parent::__construct($model);
+
+		$this->cookieUsername = new \CookieService();
+		$this->cookiePassword = new \CookieService();
 	}
 
 	public function populateErrorMessage($user){
 		if($user === null){ 
-			$this->message = "Felaktigt användarnamn"; 	
+			$this->errorMessage = "Felaktigt användarnamn"; 	
 		} else if(!$user->isValid()){
-			$this->message = "Felaktigt lösenord"; 
+			$this->errorMessage = "Felaktigt lösenord"; 
 		}
 	}
 	// Kontrollerar användare checkat i Håll mig inloggad.
@@ -50,6 +52,7 @@ class AuthView{
 	public function forgetRememberedUser(){
 		$this->cookieUsername->removeCookie($this->username);
 		$this->cookiePassword->removeCookie($this->password);
+		$this->setLogOutMessage(); 
 	}
 
 	// Hämtar användarnamn från kakan.
@@ -65,7 +68,7 @@ class AuthView{
 	// Hämtar Användarnamnet vid rätt input.
 	public function getUsername(){
 		if (empty($_POST[$this->username])) {
-			$this->message = "Användarnamn saknas!";
+			$this->errorMessage = "Användarnamn saknas!";
 			return ""; 
 		}
 		else {
@@ -76,10 +79,10 @@ class AuthView{
 	// Hämtar lösenordet vid rätt input.
 	public function getPassword(){
 		if (empty($_POST[$this->password])) {
-			if(!$this->message){
-				$this->message = "Lösenord saknas!";	
+			if(!$this->errorMessage){
+				$this->errorMessage = "Lösenord saknas!";	
 			}else{
-				$this->message .= " Lösenord saknas!";		
+				$this->errorMessage .= " Lösenord saknas!";		
 			}
 			return ""; 
 		}
@@ -88,52 +91,23 @@ class AuthView{
 		}
 	}
 
-	// Datum och tid-funktion. (Kan brytas ut till en hjälpfunktion.)
-	public function getDateTime(){
-		setlocale(LC_ALL, 'sv_SE');
-		$weekday = ucfirst(utf8_encode(strftime("%A,")));
-		$date = strftime("den %d");
-		$month = strftime("%B");
-		$year = strftime("år %Y.");
-		$time = strftime("Klockan är [%H:%M:%S].");
-		return "$weekday $date $month  $year  $time";	
-	}
-
-	// Visar fel/rättmeddelanden.
-	/*
-	public function showStatus($message){
-		if (isset($message)) {
-			$this->message = $message;
-		}
-		else{
-			$this->message = "<p>" . $message . "</p>";
-		}
-	}
-
-	// Skickar rättmeddelandet till showStatus.
-	public function successfullLogOut(){
-		$this->showStatus("Du har nu loggat ut!");
-	}
-*/
-	public function setMessage($message){
-		$this->message = $message; 
+	public function setLogOutMessage(){
+		$this->model->setSessionMessage("Du har nu loggat ut!");
 	}
 
 	// Slutlig presentation av utdata.
-	public function showLogin($displayLogoutMessage = false){
-
-		if($displayLogoutMessage){
-			$this->message = "Du har nu loggat ut!"; 
-		}
-		$datetime = $this->getDateTime();
-		$ret = RegisterUserView::getRegisterLink(); 
+	public function showLogin(){
+		$datetime = \helpers::getDateTime();
+		$ret = \view\RegisterUserView::getRegisterLink(); 
 		$ret .= "<h2>Ej inloggad!</h2>";
 
 		$ret .= "
 				<fieldset>
 				<legend>Logga in här!</legend>";
 
-		$ret .= "<p>$this->message</p>";
+		$ret .= $this->getMessage();
+
+		$ret .= "<p>" . $this->errorMessage . "</p>";
 
 		$ret .= "
 				<form action='". \config\Config::AppRoot . self::ActionLogin ."' method='post' >";
@@ -155,5 +129,4 @@ class AuthView{
 
 		return $ret;
 	}
-
 }

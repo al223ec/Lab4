@@ -1,9 +1,9 @@
 <?php
 
 require_once("src/model/AuthModel.php");
-require_once("src/view/AuthView.php");
-require_once("src/view/UserView.php");;
-require_once("src/view/RegisterUserView.php");
+require_once("src/view/auth/AuthView.php");
+require_once("src/view/auth/UserView.php");;
+require_once("src/view/register/RegisterUserView.php");
 require_once("./common/Helpers.php");
 require_once("src/controller/Controller.php");;
 
@@ -17,9 +17,9 @@ class Auth extends Controller{
 	public function __construct(){
 		// Struktur för att få till MVC.
 		$this->authModel = new \model\AuthModel();
-		$this->authView = new AuthView($this->authModel);
+		$this->authView = new \view\AuthView($this->authModel);
 		$this->helpers = new Helpers();
-		$this->userView = new UserView($this->authModel);
+		$this->userView = new \view\UserView($this->authModel);
 	}
 
 	public function main(){
@@ -55,12 +55,12 @@ class Auth extends Controller{
 			// Om "Håll mig inloggad" är ikryssad, spara i cookies.
 			if ($this->authView->RememberMeIsFilled()) {
 				$this->authView->saveToCookies($clientUsername, $clientPassword);
-				$this->userView->successfullLogInWithCookiesSaved(); 
-			}
-			else{
+				$this->userView->successfullLogInWithCookiesSaved();
+			} else {
 				$this->userView->successfullLogIn();
 			}
-			return $this->userView->showUser();; 	
+			\view\authView::redirect(); 
+			return; 
 		} else if($clientUsername !== ""){
 			$this->authView->populateErrorMessage($user);
 		}
@@ -69,7 +69,8 @@ class Auth extends Controller{
 
 	public function logout(){
 		$this->authView->forgetRememberedUser();
-		$displayLogoutMessage = $this->authModel->logOut();	
-		return $this->authView->showLogin($displayLogoutMessage); 
+		$this->authModel->logOut();	
+		\view\authView::redirect(); 	
+		return; 
 	}
 }

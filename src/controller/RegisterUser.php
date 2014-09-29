@@ -1,6 +1,6 @@
 <?php
 
-require_once("src/view/RegisterUserView.php");
+require_once("src/view/register/RegisterUserView.php");
 require_once("src/controller/Controller.php");
 require_once("src/model/RegisterUserModel.php");
 
@@ -8,25 +8,38 @@ class RegisterUser extends Controller{
 	
 	private $registerUserView; 
 	private $registerUserModel; 
+	private $authView; 
 
 	public function __construct(){
-		$this->registerUserModel = new RegisterUserModel(); 
-		$this->registeruserview = new RegisterUserView($this->registerUserModel);
+		$this->registerUserModel = new \model\RegisterUserModel(); 
+		$this->registerUserView = new \view\RegisterUserView($this->registerUserModel);
 	}
 	public function main(){
-		return $this->registeruserview->getRegisterForm(); 
+		return $this->registerUserView->getRegisterForm(); 
 	}
 
 	public function saveNewUser(){
-		$newUser = $this->registeruserview->getNewUser(); 
-		if($newUser !== null && $this->model->saveUser($newUser)){
-			$this->loginview->showStatus("Registrering av ny användare lyckades " . $newUser->getUserName());
-			return $this->loginview->showLogin();
+		$newUser = $this->getNewUser(); 
+
+		if($newUser !== null && $this->registerUserModel->saveUser($newUser)){
+			$this->registerUserView->setSuccessMessage($newUser->getUserName()); 
+			\view\ViewBase::redirect();
+			return; 
 		}
-		else if($newUser !== null){
-			return $this->registeruserview->getRegisterForm("Registrering av ny användare misslyckades"); 
-		} else {
-			return $this->registeruserview->getRegisterForm("Registrering av ny användare misslyckades"); 
-		}
+		$this->registerUserView->setFailMessage(); 
+		return $this->registerUserView->getRegisterForm(); 
+	}
+
+	private function getNewUser(){
+		$userName = $this->registerUserView->getUserName(); 
+		$password = $this->registerUserView->getPassword(); 
+
+		if($userName !== "" && $password !== ""){
+			$newUser = new \model\User(); 
+			$newUser->setUserName($userName); 
+			$newUser->setPassword($password);  
+			return $newUser; 
+		} 
+		return null; 
 	}
 }

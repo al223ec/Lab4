@@ -4,25 +4,37 @@ namespace model;
 
 require_once('src/model/Repository/UserRepository.php'); 
 require_once('src/model/User.php'); 
+require_once('src/model/SessionHandler.php'); 
 
 class AuthModel{
 
-	private $sessionLoginData = "LoginModel::LoggedInUser";
-	private $sessionUserAgent = "LoginModel::UserAgent";
+	private $sessionLoginData = "AuthModel::LoggedInUser";
+	private $sessionUserAgent = "AuthModel::UserAgent";
+	
 	private $userRepository; 
+	private $sessionHandler; 
 
 	public function __construct(){
 		$this->userRepository = new UserRepository();
+		$this->sessionHandler = new SessionHandler(); 
+	}
+	
+	public function setSessionMessage($message){
+		$this->sessionHandler->setSessionReadOnceMessage($message); 
+	}
+	
+	public function getSessionMessage(){
+		return $this->sessionHandler->getSessionReadOnceMessage(); 
 	}
 
 	// Kontrollerar om sessions-varibeln är satt vilket betyder att en användare är inloggad.
 	public function userLoggedIn($userAgent){
-		return isset($_SESSION[$this->sessionLoginData]) && $_SESSION[$this->sessionUserAgent] === $userAgent;
+		return $this->sessionHandler->getSession($this->sessionLoginData) !== "" && $this->sessionHandler->getSession($this->sessionUserAgent) === $userAgent; 
 	}
 
 	// Hämtar vilken användare som är inloggad.
 	public function getLoggedInUser(){
-		return isset($_SESSION[$this->sessionLoginData]) ? $_SESSION[$this->sessionLoginData] : null;
+		return $this->sessionHandler->getSession($this->sessionLoginData) !== "" ? $_SESSION[$this->sessionLoginData] : null;
 	}
 
 	// Kontrollerar att inmatat användarnamn och lösenord stämmer vid eventuell inloggning.
@@ -44,9 +56,10 @@ class AuthModel{
 	}
 
 	private function saveUserToSession($user, $userAgent){
-		$_SESSION[$this->sessionUserAgent] = $userAgent;
-		$_SESSION[$this->sessionLoginData] = $user;	
-
+		$elements = array(
+			$this->sessionUserAgent => $userAgent,
+			$this->sessionLoginData => $user);	
+		$this->sessionHandler->setSessionArray($elements); 
 	}
 
 	// Kontrollerar att inmatat användarnamn och lösenord stämmer vid eventuell inloggning + (med kakor och förfallodatumskontroll).
@@ -64,7 +77,7 @@ class AuthModel{
 		return null; 
 	}
 
-	// Hjälpfunktion för att spara till fil.
+	//Sparar aktuellt cookievaule och tid till dB
 	public function saveCookieValue($value, $cookieTime){
 		$userID = $this->getLoggedInUser() !== null ? $this->getLoggedInUser()->getUserID() : 0; 
 		$this->userRepository->saveCookieValue($userID, $value, $cookieTime); 
@@ -75,14 +88,11 @@ class AuthModel{
 	* @return True om det finns en session
 	*/
 	public function logOut(){
-		$ret = isset($_SESSION[$this->sessionLoginData]); 
+		$ret = $this->sessionHandler->sessionKeyIsSet($this->sessionLoginData); 
 		if($ret){
 			$this->userRepository->resetCookieValues($this->getLoggedInUser()->getUserID()); 
 		}
-		unset($_SESSION[$this->sessionLoginData]);
-		unset($_SESSION[$this->sessionUserAgent]);
-
+		$this->sessionHandler->unsetSessions(); 
 		return $ret; 
 	}
-
 }

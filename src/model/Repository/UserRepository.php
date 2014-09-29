@@ -27,7 +27,7 @@ class UserRepository Extends Repository{
 			return true; 
 		}
 		catch(\Exception $e){
-			return false; 
+			throw $e; 
 		}
 	}
 

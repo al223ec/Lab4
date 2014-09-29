@@ -10,7 +10,6 @@ class Router{
 	private $params;
 
 	public function __construct(){
-
 		$route = isset($_GET['url']) ? $_GET['url'] : '';
 		$routeParts = explode('/', $route);
 		//Se till att inte otillåtna tecken skickas med i urlen
@@ -26,6 +25,7 @@ class Router{
 			$this->controller = Configs::DefaultController; 
 		}
 		$this->params = $routeParts; 
+		isset($_GET['url']) ? $_GET['url'] = "" : ""; 
 	}
 
 	public function getAction(){
