@@ -4,26 +4,14 @@ namespace model;
 
 require_once('src/model/Repository/UserRepository.php'); 
 require_once('src/model/User.php'); 
+require_once('src/model/ModelBase.php'); 
 require_once('src/model/SessionHandler.php'); 
 
-class AuthModel{
+class AuthModel extends ModelBase{
 
 	private $sessionLoginData = "AuthModel::LoggedInUser";
 	private $sessionUserAgent = "AuthModel::UserAgent";
-	
-	private $userRepository; 
 
-	public function __construct(){
-		$this->userRepository = new UserRepository();
-	}
-	
-	public function setSessionReadOnceMessage($message){
-		sessionHandler::setSessionReadOnceMessage($message); 
-	}
-	
-	public function getSessionReadOnceMessage(){
-		return sessionHandler::getSessionReadOnceMessage(); 
-	}
 
 	// Kontrollerar om sessions-varibeln är satt vilket betyder att en användare är inloggad.
 	public function userIsLoggedIn($userAgent){

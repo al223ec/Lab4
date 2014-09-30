@@ -6,6 +6,8 @@ class ViewBase{
 	
 	protected $model;
 
+	protected $sessionKey = "ViewBase::SessionKey"; 
+
 	public function __construct($model){
 		$this->model = $model;	
 	}
@@ -28,5 +30,8 @@ class ViewBase{
         $temp = trim($input);
         return filter_var($temp, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
     }
-	
+
+    protected function setSession($message){
+    	$this->model->setSessionMessage($this->sessionKey, $message); 
+    }
 }

@@ -23,6 +23,12 @@ class SessionHandler{
 		return $ret; 
 	}
 
+	public static function readAndRemoveSession($key){
+		$ret = isset($_SESSION[$key]) ? $_SESSION[$key] : ""; 
+		unset($_SESSION[$key]);
+		return $ret; 
+	}
+
 	public static function readFromSession($key){
 		isset($_SESSION[$key]) ?  $_SESSION[$key] : "";
 	}
@@ -30,6 +36,8 @@ class SessionHandler{
 	public static function setSession($key, $value){
 		$_SESSION[$key] = $value; 
 	}
+
+
 
 	public static function getSession($key){
 		return isset($_SESSION[$key]) ? $_SESSION[$key] : ""; 

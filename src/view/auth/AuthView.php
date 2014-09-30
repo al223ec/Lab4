@@ -109,7 +109,10 @@ class AuthView extends ViewBase{
 		
 		// Om det inte finns något inmatat användarnamn så visa tom input.
 		// Annars visa det tidigare inmatade användarnamnet i input.
+		$sessionValue = $this->model->readAndRemoveSessionMessage($this->sessionKey); 
 		$uservalue = empty($_POST[$this->username]) ? "" : $_POST[$this->username]; 
+		$uservalue = $sessionValue !== "" ? $sessionValue : $uservalue; 
+		
 		$ret .= "Användarnamn: <input type='text' name='$this->username' value='$uservalue'>";
 	
 		$ret .= "

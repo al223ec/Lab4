@@ -26,11 +26,13 @@ class RegisterUserView extends ViewBase{
 
 	public function setSuccessMessage($userName){
 		$this->model->setSessionReadOnceMessage("Registrering av ny användare lyckades " . $userName);
+		$this->setSession($userName); 
 	}
 
 	public function setFailMessage(){
 		$this->model->setSessionReadOnceMessage("Registrering av ny användare misslyckades fatalt vg försök igen!");
 	}
+
 
 	public function getUserName(){
 		$ret = $this->getCleanInput($this->userName);
