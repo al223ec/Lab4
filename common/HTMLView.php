@@ -1,5 +1,5 @@
 <?php
-
+require_once("./common/Helpers.php");
 class HTMLView{
 	public function echoHTML($body){
 		if($body === NULL){
@@ -19,6 +19,9 @@ class HTMLView{
 				<div class='wrapper'>
 					<h1>Laboration 4 - Registrera nya användare - al223bn/al223ec</h1>
 					$body
+					<p>
+						" . \Helpers::getDateTime() . "
+					</p>
 				</div>
 			</body>
 			</html>";

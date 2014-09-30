@@ -15,7 +15,6 @@ class AuthView extends ViewBase{
 	private $errorMessage;								// Privat variabel för att visa fel/rättmeddelanden.
 
 	//Min uppdatering ta bort strängberoende
-	const ActionLogin = "Auth/login"; 
 	const RememberMe = "LoginView::checked"; 
 
 	public function __construct(\model\AuthModel $model){
@@ -67,37 +66,33 @@ class AuthView extends ViewBase{
 
 	// Hämtar Användarnamnet vid rätt input.
 	public function getUsername(){
-		if (empty($_POST[$this->username])) {
+		$ret = $this->getCleanInput($this->username); 
+		if($ret === ""){
 			$this->errorMessage = "Användarnamn saknas!";
 			return ""; 
 		}
-		else {
-			return $_POST[$this->username];	
-		}
+		return $ret; 
 	}
 
 	// Hämtar lösenordet vid rätt input.
 	public function getPassword(){
-		if (empty($_POST[$this->password])) {
+		$ret = $this->getCleanInput($this->password); 
+		if($ret === ""){
 			if(!$this->errorMessage){
 				$this->errorMessage = "Lösenord saknas!";	
 			}else{
-				$this->errorMessage .= " Lösenord saknas!";		
+				$this->errorMessage .= "Lösenord saknas!";		
 			}
-			return ""; 
 		}
-		else {
-			return $_POST[$this->password];	
-		}
+		return $ret; 
 	}
 
 	public function setLogOutMessage(){
-		$this->model->setSessionMessage("Du har nu loggat ut!");
+		$this->model->setSessionReadOnceMessage("Du har nu loggat ut!");
 	}
 
 	// Slutlig presentation av utdata.
 	public function showLogin(){
-		$datetime = \helpers::getDateTime();
 		$ret = \view\RegisterUserView::getRegisterLink(); 
 		$ret .= "<h2>Ej inloggad!</h2>";
 
@@ -110,7 +105,7 @@ class AuthView extends ViewBase{
 		$ret .= "<p>" . $this->errorMessage . "</p>";
 
 		$ret .= "
-				<form action='". \config\Config::AppRoot . self::ActionLogin ."' method='post' >";
+				<form action='". \router::$route['auth']['login'] . "' method='post' >";
 		
 		// Om det inte finns något inmatat användarnamn så visa tom input.
 		// Annars visa det tidigare inmatade användarnamnet i input.
@@ -124,8 +119,6 @@ class AuthView extends ViewBase{
 				</form>
 				</fieldset>
 				";
-
-		$ret .= "<p>$datetime</p>";
 
 		return $ret;
 	}

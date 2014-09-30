@@ -13,14 +13,12 @@ class User{
 	private $cookieTime; 
 
 	private $valid; 
-	private $errors; 
-
 
 	public function __construct($userID = 0){
-		$this->userID = $userID;  
-		$this->errors = array(); 
+		$this->userID = $userID; 
 		$this->valid = false; 
 	}
+	
 	public function validate($password){
 		if(crypt($password, $this->passwordHash) === $this->passwordHash ){
 			$this->valid = true; 
@@ -77,9 +75,6 @@ class User{
 	public function validateByCookieValue($cookieValue){
 		$this->valid = $this->cookieValue === $cookieValue && $this->cookieTime > time(); 
 		return $this->valid; 
-
-	}
-	public function getErrors(){
 
 	}
 	

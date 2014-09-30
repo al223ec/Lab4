@@ -5,21 +5,19 @@ require_once('src/model/Repository/UserRepository.php');
 require_once('src/model/User.php'); 
 require_once("src/model/SessionHandler.php");
 
-class RegisterUserModel{
+class RegisterUserModel {
 
-	private $userRepository; 
-	private $sessionMessage = "AuthModel::Message"; 
+	private $userRepository;
 	
 	public function __construct(){
 		$this->userRepository = new UserRepository();
-		$this->sessionHandler = new SessionHandler(); 
 	}
 	
-	public function setSessionMessage($message){
-		$this->sessionHandler->setSessionReadOnceMessage($message); 
+	public function setSessionReadOnceMessage($message){
+		sessionHandler::setSessionReadOnceMessage($message); 
 	}
-	public function getSessionMessage(){
-		return $this->sessionHandler->getSessionReadOnceMessage(); 
+	public function getSessionReadOnceMessage(){
+		return sessionHandler::getSessionReadOnceMessage(); 
 	}
 
 	public function saveUser(\model\User $newUser){
@@ -30,7 +28,7 @@ class RegisterUserModel{
 		}
 	}
 	/**
-	*True if exists
+	* @return True if exists
 	*/
 	public function ceckIfUserNameExists($userName){
 		return $this->userRepository->getUserWithUserName($userName) !== null;

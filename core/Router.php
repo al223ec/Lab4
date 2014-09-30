@@ -3,13 +3,15 @@
 require_once("config/Configs.php"); 
 
 class Router{
-	
-	private $route;
+	public static $route;
+
 	private $controller;
 	private $action;
 	private $params;
 
 	public function __construct(){
+		self::initRoutes(); 
+
 		$route = isset($_GET['url']) ? $_GET['url'] : '';
 		$routeParts = explode('/', $route);
 		//Se till att inte otillåtna tecken skickas med i urlen
@@ -44,5 +46,18 @@ class Router{
 	
 	public function getParams(){
 	    return $this->params;  
+	}
+
+	public static function initRoutes(){
+		self::$route = array(
+			"auth" => array(
+				"login" =>  \config\Config::AppRoot . "Auth/login", 
+				"logout" => \config\Config::AppRoot . "Auth/Logout"
+				),
+			"register" => array(
+				"registerUser" => \config\Config::AppRoot . "RegisterUser/",
+				"saveNewUser" => \config\Config::AppRoot .  "RegisterUser/SaveNewUser" 
+				)
+			); 
 	} 
 }

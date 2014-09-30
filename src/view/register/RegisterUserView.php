@@ -25,11 +25,11 @@ class RegisterUserView extends ViewBase{
 	}
 
 	public function setSuccessMessage($userName){
-		$this->model->setSessionMessage("Registrering av ny användare lyckades " . $userName);
+		$this->model->setSessionReadOnceMessage("Registrering av ny användare lyckades " . $userName);
 	}
 
 	public function setFailMessage(){
-		$this->model->setSessionMessage("Registrering av ny användare misslyckades fatalt vg försök igen!");
+		$this->model->setSessionReadOnceMessage("Registrering av ny användare misslyckades fatalt vg försök igen!");
 	}
 
 	public function getUserName(){
@@ -71,7 +71,7 @@ class RegisterUserView extends ViewBase{
 	}
 
 	public function getRegisterForm(){
-		return" 
+		return "				
 				<h2>Ej inloggad, registrera ny användare!</h2>
 				<fieldset>
 				<legend>Registrera ny användare - skriv in användarnamn och lösenord</legend>
@@ -104,16 +104,4 @@ class RegisterUserView extends ViewBase{
 			return "<span class='errormessage'> " . $this->errorMessages[$key] . " </span>"; 
 		}
 	}
-
-	/** Fuktion för att lägga till errormessages utanför klassen
-	*
-	*/
-	/*
-	private function addErrorMessage($key, $errorMessage){
-		if($key === self::PasswordError || $key === self::UserNameError){
-			$this->errorMessages[$key] = $errorMessage; 
-		} else { 
-			throw new \Exception("LoginView::addErrorMessage fel nyckel skickad till funktionen!!");
-		}
-	}*/
 }

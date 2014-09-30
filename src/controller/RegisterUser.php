@@ -7,8 +7,7 @@ require_once("src/model/RegisterUserModel.php");
 class RegisterUser extends Controller{
 	
 	private $registerUserView; 
-	private $registerUserModel; 
-	private $authView; 
+	private $registerUserModel;
 
 	public function __construct(){
 		$this->registerUserModel = new \model\RegisterUserModel(); 

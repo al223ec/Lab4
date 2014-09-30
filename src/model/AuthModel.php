@@ -12,29 +12,27 @@ class AuthModel{
 	private $sessionUserAgent = "AuthModel::UserAgent";
 	
 	private $userRepository; 
-	private $sessionHandler; 
 
 	public function __construct(){
 		$this->userRepository = new UserRepository();
-		$this->sessionHandler = new SessionHandler(); 
 	}
 	
-	public function setSessionMessage($message){
-		$this->sessionHandler->setSessionReadOnceMessage($message); 
+	public function setSessionReadOnceMessage($message){
+		sessionHandler::setSessionReadOnceMessage($message); 
 	}
 	
-	public function getSessionMessage(){
-		return $this->sessionHandler->getSessionReadOnceMessage(); 
+	public function getSessionReadOnceMessage(){
+		return sessionHandler::getSessionReadOnceMessage(); 
 	}
 
 	// Kontrollerar om sessions-varibeln är satt vilket betyder att en användare är inloggad.
-	public function userLoggedIn($userAgent){
-		return $this->sessionHandler->getSession($this->sessionLoginData) !== "" && $this->sessionHandler->getSession($this->sessionUserAgent) === $userAgent; 
+	public function userIsLoggedIn($userAgent){
+		return sessionHandler::getSession($this->sessionLoginData) !== "" && sessionHandler::getSession($this->sessionUserAgent) === $userAgent; 
 	}
 
 	// Hämtar vilken användare som är inloggad.
 	public function getLoggedInUser(){
-		return $this->sessionHandler->getSession($this->sessionLoginData) !== "" ? $_SESSION[$this->sessionLoginData] : null;
+		return sessionHandler::getSession($this->sessionLoginData) !== "" ? sessionHandler::getSession($this->sessionLoginData) : null;
 	}
 
 	// Kontrollerar att inmatat användarnamn och lösenord stämmer vid eventuell inloggning.
@@ -59,7 +57,7 @@ class AuthModel{
 		$elements = array(
 			$this->sessionUserAgent => $userAgent,
 			$this->sessionLoginData => $user);	
-		$this->sessionHandler->setSessionArray($elements); 
+		sessionHandler::setSessionArray($elements); 
 	}
 
 	// Kontrollerar att inmatat användarnamn och lösenord stämmer vid eventuell inloggning + (med kakor och förfallodatumskontroll).
@@ -88,11 +86,11 @@ class AuthModel{
 	* @return True om det finns en session
 	*/
 	public function logOut(){
-		$ret = $this->sessionHandler->sessionKeyIsSet($this->sessionLoginData); 
+		$ret = sessionHandler::sessionKeyIsSet($this->sessionLoginData); 
 		if($ret){
 			$this->userRepository->resetCookieValues($this->getLoggedInUser()->getUserID()); 
 		}
-		$this->sessionHandler->unsetSessions(); 
+		sessionHandler::unsetSessions(); 
 		return $ret; 
 	}
 }

@@ -21,12 +21,14 @@ class Auth extends Controller{
 		$this->helpers = new Helpers();
 		$this->userView = new \view\UserView($this->authModel);
 	}
-
+	/**
+	* Kontroller om användaren är inloggad
+	*/
 	public function main(){
 		$userAgent = $this->helpers->getUserAgent();
-		if($this->authView->userIsRemembered() and !$this->authModel->userLoggedIn($userAgent)){
+		if($this->authView->userIsRemembered() && !$this->authModel->userIsLoggedIn($userAgent)){
 			$loggedInUser = $this->authModel->checkLoginWithCookies($this->authView->getUsernameCookie(), $this->authView->getPasswordCookie(), $userAgent); 
-
+			
 			if($loggedInUser !== null && $loggedInUser->isValid()){
 				$this->userView->successfullLogInWithCookiesLoad();						
 			} else{
@@ -34,7 +36,7 @@ class Auth extends Controller{
 			}
 		}
 
-		if($this->authModel->userLoggedIn($userAgent)){
+		if($this->authModel->userIsLoggedIn($userAgent)){
 			return $this->userView->showUser();
 		}
 		return $this->authView->showLogin();
@@ -42,7 +44,7 @@ class Auth extends Controller{
 
 	public function login(){
 		$userAgent = $this->helpers->getUserAgent();	
-			// Hämtar användarnamn och lösenord.
+		// Hämtar användarnamn och lösenord.
 		$clientUsername = $this->authView->getUsername();
 		$clientPassword = $this->authView->getPassword();		
 		$user = null; 
@@ -59,8 +61,9 @@ class Auth extends Controller{
 			} else {
 				$this->userView->successfullLogIn();
 			}
+			//Lyckad inloggning
 			\view\authView::redirect(); 
-			return; 
+			exit();
 		} else if($clientUsername !== ""){
 			$this->authView->populateErrorMessage($user);
 		}
@@ -71,6 +74,6 @@ class Auth extends Controller{
 		$this->authView->forgetRememberedUser();
 		$this->authModel->logOut();	
 		\view\authView::redirect(); 	
-		return; 
+		exit();
 	}
 }

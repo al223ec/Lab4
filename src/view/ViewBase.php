@@ -15,10 +15,7 @@ class ViewBase{
 	}
 	
 	protected function getMessage(){
-		return "<p>" . $this->model->getSessionMessage() . "</p>"; 
-	}
-	protected function setMessage($message){
-		$this->model->setSessionMessage($message); 
+		return "<p>" . $this->model->getSessionReadOnceMessage() . "</p>"; 
 	}
 
 	protected function getInput($inputName){
