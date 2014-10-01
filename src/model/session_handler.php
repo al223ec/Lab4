@@ -7,6 +7,14 @@ class SessionHandler{
 	//Statisk klass för att hantera sessions, denna klass ska vara singelton över appens livscykel
 	private static $readOnceMessage = "MySession::ReadOnce";
 
+	/**
+	* Vill inte skapa några instanser av detta objekt 
+	* detta för att tydliggöra att det endast finns "en" session att tillgå i applikationen, om jag nu fattat den biten korrekt. 
+	* 
+	*/
+	private function __construct(){ }
+
+
 	public static function setSessionArray(array $elemts){
 		foreach ($elemts as $key => $value) {
 			$_SESSION[$key] = $value;
@@ -36,8 +44,6 @@ class SessionHandler{
 	public static function setSession($key, $value){
 		$_SESSION[$key] = $value; 
 	}
-
-
 
 	public static function getSession($key){
 		return isset($_SESSION[$key]) ? $_SESSION[$key] : ""; 

@@ -1,10 +1,11 @@
 <?php
 
-require_once("src/view/register/RegisterUserView.php");
-require_once("src/controller/Controller.php");
-require_once("src/model/RegisterUserModel.php");
+require_once("src/view/register/register_user_view.php");
+require_once("src/controller/controller.php");
+require_once("src/model/register_user_model.php");
 
-class RegisterUser extends Controller{
+//Måste vara mer konsekvent i min namngivning
+class Registeruser extends Controller{
 	
 	private $registerUserView; 
 	private $registerUserModel;
@@ -28,7 +29,7 @@ class RegisterUser extends Controller{
 		$this->registerUserView->setFailMessage(); 
 		return $this->registerUserView->getRegisterForm(); 
 	}
-
+	//Flytta denna till vyn?? 
 	private function getNewUser(){
 		$userName = $this->registerUserView->getUserName(); 
 		$password = $this->registerUserView->getPassword(); 

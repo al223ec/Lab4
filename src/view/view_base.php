@@ -2,11 +2,11 @@
 
 namespace view;
 
-class ViewBase{
+abstract class ViewBase{
 	
-	protected $model;
-
-	protected $sessionKey = "ViewBase::SessionKey"; 
+	protected $model; 
+	
+	private $sessionKey = "ViewBase::SessionKey"; 
 
 	public function __construct($model){
 		$this->model = $model;	
@@ -33,5 +33,15 @@ class ViewBase{
 
     protected function setSession($message){
     	$this->model->setSessionMessage($this->sessionKey, $message); 
+    }
+/*
+    private $userNameSessionKey = "ViewBase::NewUserNameSessionKey"; 
+    //"Fula" funktioner
+    protected function saveNewlyAddedUserName($userName){
+    	$this->model->setSessionMessage($this->userNameSessionKey, $userName); 
+    } */
+
+    protected function getNewlyAddedUserName(){
+    	return $this->model->readAndRemoveSessionMessage($this->sessionKey); 
     }
 }

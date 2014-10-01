@@ -1,11 +1,11 @@
 <?php
 
-require_once("src/model/AuthModel.php");
-require_once("src/view/auth/AuthView.php");
-require_once("src/view/auth/UserView.php");;
-require_once("src/view/register/RegisterUserView.php");
-require_once("./common/Helpers.php");
-require_once("src/controller/Controller.php");;
+require_once("src/model/auth_model.php");
+require_once("src/view/auth/auth_view.php");
+require_once("src/view/auth/user_view.php");;
+require_once("src/view/register/register_user_view.php");
+require_once("./common/helpers.php");
+require_once("src/controller/controller.php");;
 
 class Auth extends Controller{
 
@@ -32,6 +32,7 @@ class Auth extends Controller{
 			if($loggedInUser !== null && $loggedInUser->isValid()){
 				$this->userView->successfullLogInWithCookiesLoad();						
 			} else{
+				$this->authView->setFaultyCookiesMessage(); 
 				$this->authView->forgetRememberedUser();
 			}
 		}
@@ -72,7 +73,9 @@ class Auth extends Controller{
 
 	public function logout(){
 		$this->authView->forgetRememberedUser();
+		$this->authView->setLogOutMessage(); 
 		$this->authModel->logOut();	
+
 		\view\authView::redirect(); 	
 		exit();
 	}

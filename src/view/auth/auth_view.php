@@ -2,9 +2,9 @@
 
 namespace view; 
 
-require_once("src/view/CookieService.php");
-require_once("src/config/Config.php");
-require_once("src/view/ViewBase.php");
+require_once("src/view/cookie_service.php");
+require_once("src/config/config.php");
+require_once("src/view/view_base.php");
 
 class AuthView extends ViewBase{
 	
@@ -15,11 +15,10 @@ class AuthView extends ViewBase{
 	private $errorMessage;								// Privat variabel för att visa fel/rättmeddelanden.
 
 	//Min uppdatering ta bort strängberoende
-	const RememberMe = "LoginView::checked"; 
+	private static $RememberMe = "LoginView::checked"; 
 
 	public function __construct(\model\AuthModel $model){
 		parent::__construct($model);
-
 		$this->cookieUsername = new \CookieService();
 		$this->cookiePassword = new \CookieService();
 	}
@@ -33,7 +32,7 @@ class AuthView extends ViewBase{
 	}
 	// Kontrollerar användare checkat i Håll mig inloggad.
 	public function RememberMeIsFilled(){
-		return isset($_POST[self::RememberMe]); 
+		return isset($_POST[self::$RememberMe]); 
 	}
 
 	// Funktion för att hämta sparade kakor.
@@ -51,7 +50,6 @@ class AuthView extends ViewBase{
 	public function forgetRememberedUser(){
 		$this->cookieUsername->removeCookie($this->username);
 		$this->cookiePassword->removeCookie($this->password);
-		$this->setLogOutMessage(); 
 	}
 
 	// Hämtar användarnamn från kakan.
@@ -91,9 +89,12 @@ class AuthView extends ViewBase{
 		$this->model->setSessionReadOnceMessage("Du har nu loggat ut!");
 	}
 
+	public function setFaultyCookiesMessage(){
+		$this->model->setSessionReadOnceMessage("Felaktig information i kakan!");
+	}
 	// Slutlig presentation av utdata.
 	public function showLogin(){
-		$ret = \view\RegisterUserView::getRegisterLink(); 
+		$ret = 	"<a href='" . \router::$route['register']['register'] . "'> Registrera ny användare </a>";  
 		$ret .= "<h2>Ej inloggad!</h2>";
 
 		$ret .= "
@@ -109,14 +110,17 @@ class AuthView extends ViewBase{
 		
 		// Om det inte finns något inmatat användarnamn så visa tom input.
 		// Annars visa det tidigare inmatade användarnamnet i input.
-		$sessionValue = $this->model->readAndRemoveSessionMessage($this->sessionKey); 
-		$uservalue = empty($_POST[$this->username]) ? "" : $_POST[$this->username]; 
-		$uservalue = $sessionValue !== "" ? $sessionValue : $uservalue; 
+		//kan innehålla ett användarnamn, jävligt osnygg lösning.
+		$newlyAddedUserName = $this->getNewlyAddedUserName();
 		
+		$uservalue = empty($_POST[$this->username]) ? "" : $_POST[$this->username];
+
+		$uservalue = $newlyAddedUserName !== "" ? $newlyAddedUserName : $uservalue; 
+
 		$ret .= "Användarnamn: <input type='text' name='$this->username' value='$uservalue'>";
 	
 		$ret .= "
-					Lösenord: <input type='text' name='$this->password'>
+					Lösenord: <input type='password' name='$this->password'>
 					Håll mig inloggad: <input type='checkbox' name='LoginView::checked'>
 					<input type='submit' value='Logga in' name='LoginView::login'>
 				</form>

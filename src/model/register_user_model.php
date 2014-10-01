@@ -1,10 +1,10 @@
 <?php
 
 namespace model; 
-require_once('src/model/Repository/UserRepository.php'); 
-require_once('src/model/User.php'); 
-require_once('src/model/ModelBase.php');
-require_once("src/model/SessionHandler.php");
+require_once('src/model/repository/user_repository.php'); 
+require_once('src/model/user.php'); 
+require_once('src/model/model_base.php');
+require_once("src/model/session_handler.php");
 
 class RegisterUserModel extends ModelBase{
 

@@ -1,11 +1,10 @@
 <?php
 namespace view; 
 
-require_once('src/view/ViewBase.php'); 
+require_once('src/view/view_base.php'); 
 
-class UserView extends ViewBase{	
-	private $controller = "auth"; 
-	private $action = "logout"; 
+class UserView extends ViewBase{
+
 	// Skickar rättmeddelandet till setSessionMessage.
 	public function successfullLogIn(){
 		$this->model->setSessionReadOnceMessage("Inloggningen lyckades!");
@@ -28,7 +27,7 @@ class UserView extends ViewBase{
 		
 		$ret .= $this->getMessage();
 		$ret .= "
-					<form action='". \router::$route[$this->controller][$this->action] . "' method='post' >
+					<form action='". \router::$route['auth']['logout'] . "' method='post' >
 					<input type='submit' value='Logga ut' name=''>
 					</form>
 				";		

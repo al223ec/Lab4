@@ -2,8 +2,8 @@
 
 namespace model; 
 
-require_once("src/model/Repository/Repository.php"); 
-require_once("src/model/User.php"); 
+require_once("src/model/repository/repository.php"); 
+require_once("src/model/user.php"); 
 
 class UserRepository Extends Repository{
 	

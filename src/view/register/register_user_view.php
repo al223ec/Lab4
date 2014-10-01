@@ -2,15 +2,12 @@
 
 namespace view; 
 
-require_once('src/model/User.php'); 
-require_once('src/config/Config.php'); 
-require_once('src/view/ViewBase.php'); 
+require_once('src/model/user.php'); 
+require_once('src/config/config.php'); 
+require_once('src/view/view_base.php'); 
 
 class RegisterUserView extends ViewBase{
-	
-	const ActionRegister = 		"RegisterUser/"; 
-	const ActionSaveNewUser = 	"RegisterUser/SaveNewUser"; 
-	
+
 	private $userName = 		"RegisterUserView::UserName";	
 	private $password = 		"RegisterUserView::Password";	
 	private $repeatedPassword = "RegisterUserView::RepeatedPassword";	
@@ -67,21 +64,17 @@ class RegisterUserView extends ViewBase{
 		return $ret; 
 	}
 
-
-	public static function getRegisterLink(){
-		return "<a href='". \config\Config::AppRoot . self::ActionRegister ."'> Registrera ny användare </a>"; 
-	}
-
 	public function getRegisterForm(){
-		return "				
+		return "<a href='" . \router::$route['auth']['main'] . "'> <<< Tillbaka </a> 
+		
 				<h2>Ej inloggad, registrera ny användare!</h2>
 				<fieldset>
 				<legend>Registrera ny användare - skriv in användarnamn och lösenord</legend>
 				". $this->getMessage() . "
-				<form action='". \config\Config::AppRoot . self::ActionSaveNewUser . "' method='post' >
+				<form action='". \router::$route['register']['save'] . "' method='post' >
 				<fieldset>
 					<label for='RegisterUserNameID' >Namn  :</label>
-					<input type='text' name='" . $this->userName . "' id='RegisterUserNameID' value=". $this->getInput($this->userName) .">"
+					<input type='text' name='" . $this->userName . "' id='RegisterUserNameID' value=". $this->getCleanInput($this->userName) .">"
 					. $this->getErrorMessages(self::UserNameErrorKey) . 
 					"
 				</fieldset>
@@ -95,7 +88,7 @@ class RegisterUserView extends ViewBase{
 					<input type='text' name='". $this->repeatedPassword . "' id='RepeatedPasswordID'>
 					" . $this->getErrorMessages(self::PasswordErrorKey) . "
 				</fieldset>
-				<input type='submit' value='Registrera' name='LoginView::login'>
+				<input type='submit' value='Registrera'>
 				</form>
 				</fieldset>
 				";

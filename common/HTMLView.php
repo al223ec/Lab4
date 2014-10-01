@@ -1,5 +1,7 @@
 <?php
-require_once("./common/Helpers.php");
+
+require_once("./common/helpers.php");
+
 class HTMLView{
 	public function echoHTML($body){
 		if($body === NULL){

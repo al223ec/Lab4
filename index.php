@@ -1,16 +1,15 @@
 <?php
 
 
-require_once("src/model/User.php");
-require_once("common/HTMLView.php");
-require_once("core/Main.php"); 
-require_once("core/Router.php"); 
+require_once("src/model/user.php");
+require_once("common/htmlview.php");
+require_once("core/router.php"); 
 
 session_start();
 
 $router = new Router();  
 $view = new  HTMLView();
-$view->echoHTML(Main::dispatch($router));
+$view->echoHTML($router->dispatch());
 
 /** Angående att spara object i session - http://stackoverflow.com/questions/132194/php-storing-objects-inside-the-session
 

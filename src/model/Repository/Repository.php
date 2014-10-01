@@ -18,7 +18,7 @@ abstract class Repository{
 		return new \PDO(self::$CONNECTIONSTRING, self::$DB_USERNAME, self::$DB_PASSWORD);
 	} 
 	/**
-	*stulen metod från Emil, inte testat eller använd än
+	*stulen metod från Emil, inte testat eller använd än, 
 	*/
 	public function query($sql, $params = NULL) {
 

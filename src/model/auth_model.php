@@ -2,10 +2,10 @@
 
 namespace model; 
 
-require_once('src/model/Repository/UserRepository.php'); 
-require_once('src/model/User.php'); 
-require_once('src/model/ModelBase.php'); 
-require_once('src/model/SessionHandler.php'); 
+require_once('src/model/repository/user_repository.php'); 
+require_once('src/model/user.php'); 
+require_once('src/model/model_base.php'); 
+require_once('src/model/session_handler.php'); 
 
 class AuthModel extends ModelBase{
 
@@ -51,6 +51,9 @@ class AuthModel extends ModelBase{
 	// Kontrollerar att inmatat användarnamn och lösenord stämmer vid eventuell inloggning + (med kakor och förfallodatumskontroll).
 	public function checkLoginWithCookies($clientUsername, $cookieValue, $userAgent){
 		$user = $this->userRepository->getUserWithUserName($clientUsername); 
+		if($user === null){
+			return null; 
+		}
 		$user->validateByCookieValue($cookieValue); 
 		
 		if($user->getCookieTime() < time()){
